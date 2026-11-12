@@ -15,6 +15,7 @@ A Spring Boot REST API application that searches GitHub repositories using the G
 - Swagger / OpenAPI
 - JUnit 5
 - Mockito
+- Docker
 
 ## Features
 
@@ -33,6 +34,7 @@ A Spring Boot REST API application that searches GitHub repositories using the G
 ```text
 github-repository-searcher/
 │
+├── Dockerfile
 ├── src/
 │   ├── main/
 │   │   ├── java/com/niyas/githubsearcher/
@@ -63,8 +65,10 @@ Make sure the following are installed:
 
 - Java 21 or later
 - PostgreSQL
-- Maven (optional if using the Maven wrapper)
+- Git
 - Eclipse IDE or another Java IDE
+
+Maven is optional because the project includes the Maven wrapper.
 
 ## Database Configuration
 
@@ -90,7 +94,15 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.open-in-view=false
 ```
 
-Set the `DB_PASSWORD` environment variable to your PostgreSQL password before running the application.
+### Environment Variables
+
+The application uses environment variables to configure database connectivity.
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | JDBC PostgreSQL connection URL |
+| `DB_USERNAME` | PostgreSQL database username |
+| `DB_PASSWORD` | PostgreSQL database password |
 
 **Windows PowerShell:**
 
@@ -111,7 +123,7 @@ The application uses the default database URL and username shown above if `DB_UR
 ### 1. Clone the repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/Niyas99/github-repository-searcher.git
 ```
 
 ### 2. Navigate to the project directory
@@ -120,7 +132,11 @@ git clone YOUR_GITHUB_REPOSITORY_URL
 cd github-repository-searcher
 ```
 
-### 3. Run the application
+### 3. Configure the database
+
+Create the PostgreSQL database and configure the required environment variables.
+
+### 4. Run the application
 
 Using Maven:
 
@@ -148,11 +164,11 @@ http://localhost:8086
 
 ## API Documentation
 
-**Swagger UI:**
+Swagger UI provides interactive API documentation.
 
-```text
+**Local Swagger UI:**
+
 http://localhost:8086/swagger-ui/index.html
-```
 
 Open Swagger UI to explore and test the available REST endpoints.
 
@@ -160,9 +176,13 @@ Open Swagger UI to explore and test the available REST endpoints.
 
 ### 1. Search GitHub Repositories
 
-**Method:** POST
+**Method:** `POST`
 
-**Endpoint:** `/api/github/search`
+**Endpoint:**
+
+```text
+/api/github/search
+```
 
 Searches GitHub repositories using the provided query and saves the results in PostgreSQL.
 
@@ -170,18 +190,19 @@ Searches GitHub repositories using the provided query and saves the results in P
 
 ```json
 {
-  "query": "spring boot",
-  "language": "Java",
-  "sort": "stars",
-  "order": "desc"
+  "query": "spring boot"
 }
 ```
 
 ### 2. Retrieve Stored Repositories
 
-**Method:** GET
+**Method:** `GET`
 
-**Endpoint:** `/api/github/repositories`
+**Endpoint:**
+
+```text
+/api/github/repositories
+```
 
 Retrieves repositories stored in PostgreSQL.
 
@@ -191,8 +212,8 @@ Retrieves repositories stored in PostgreSQL.
 |---|---|
 | `language` | Filter by programming language |
 | `minStars` | Minimum number of stars |
-| `sortBy` | Sort by stars, forks, or updatedAt |
-| `order` | Sort order: asc or desc |
+| `sortBy` | Sort by `stars`, `forks`, or `updatedAt` |
+| `order` | Sort order: `asc` or `desc` |
 
 **Example Request:**
 
@@ -210,29 +231,60 @@ The project includes unit and integration tests to verify:
 - Filtering by minimum stars.
 - Sorting repositories.
 - Database integration.
+- Controller functionality.
 
-Run the tests using:
+Run the tests using Maven:
 
 ```bash
 mvn clean test
 ```
 
-Alternatively, use the Maven wrapper:
+Alternatively, use the Maven wrapper on Windows:
 
 ```powershell
 .\mvnw.cmd clean test
 ```
 
+On Linux or macOS:
+
+```bash
+./mvnw clean test
+```
+
 ## Error Handling
 
-The application handles invalid input, unexpected GitHub API responses, and other application errors using centralized exception handling.
+The application handles:
+
+- Invalid request parameters.
+- Validation errors.
+- Unexpected GitHub API responses.
+- Database and application errors.
+
+Centralized exception handling returns appropriate HTTP status codes and error messages.
 
 ## Deployment
 
-Deployment details will be added after publishing the application.
+The application is deployed on **Render**.
 
-- **Base URL:** Add your deployed API URL here.
-- **Swagger UI:** Add your deployed Swagger URL here.
+- **GitHub Repository:** [https://github.com/Niyas99/github-repository-searcher](https://github.com/Niyas99/github-repository-searcher)
+- **Live API Base URL:** [https://github-repository-searcher-0bg4.onrender.com](https://github-repository-searcher-0bg4.onrender.com)
+- **Swagger UI:** [https://github-repository-searcher-0bg4.onrender.com/swagger-ui/index.html](https://github-repository-searcher-0bg4.onrender.com/swagger-ui/index.html)
+
+The application uses a PostgreSQL database hosted on Render.
+
+### Environment Variables
+
+Configure the following environment variables in the Render Web Service:
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | JDBC-formatted PostgreSQL connection URL |
+| `DB_USERNAME` | PostgreSQL database username |
+| `DB_PASSWORD` | PostgreSQL database password |
+
+**Note:** Use the Render Internal Database URL as the source for your connection details. For `DB_URL`, make sure the URL starts with `jdbc:postgresql://`. Use the username and password in their separate environment variables.
+
+The application is deployed using Docker.
 
 ## Author
 
